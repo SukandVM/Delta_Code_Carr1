@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Level 1: Captain's Log - Cursed Chart</title>
+    <title>Level 1: The Independent Cursed Chart</title>
     <style>
         :root {
             --parchment: #f4e4bc;
             --ink: #2c1a0b;
             --blood: #8b0000;
             --seaweed: rgba(34, 139, 34, 0.6);
+            --map-url: url('https://i.imgur.com/image_19be94.jpg'); 
         }
 
         body {
@@ -37,22 +38,16 @@
 
         #map-wrapper {
             position: relative;
-            width: 70vh; height: 70vh;
-            background: url('https://i.imgur.com/image_19be94.jpg') no-repeat center;
-            background-size: 100% 100%;
+            width: 75vh; 
+            height: 75vh;
+            background: var(--map-url) no-repeat center;
+            background-size: cover;
             border: 15px solid #3d2b1f;
             box-shadow: 0 0 50px rgba(0,0,0,0.9);
             z-index: 100;
         }
 
-        #fog-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 120;
-            pointer-events: none;
-        }
-
+        
         #pseudo-trap::after {
             content: "\0041"; 
             position: absolute; top: 20%; left: 20%;
@@ -71,7 +66,7 @@
         #honeypot-veil {
             position: absolute; width: 100%; height: 100%;
             z-index: 200;
-            background: rgba(139, 0, 0, 0.02); 
+            background: rgba(139, 0, 0, 0.05); 
         }
 
         #treasure-x {
@@ -120,7 +115,6 @@
 
     <div id="map-wrapper">
         <div id="honeypot-veil"></div>
-        <canvas id="fog-canvas"></canvas>
         <div id="pseudo-trap"></div>
         <div id="seaweed-layer"></div>
         <div id="treasure-x">X</div>
@@ -144,11 +138,11 @@
 
 <script>
     const allTasks = [
-        { id: '577261697468', desc: "Find the Ghost in the Captain's Siren Shed." },
+        { id: '577261697468', desc: "Find the Ghost in the Captain's Siren Shed (Opacity curse)." },
         { id: '4c657669617468616e', desc: "The Kraken button has surfaced. Catch it to claim the Log!" },
-        { id: '466c6f7261', desc: "The Ship is stuck on some seaweeds. Clear them." },
-        { id: '5368726f7564', desc: "The 'honeypot-veil' clouds your vision. Dissolve it." },
-        { id: '476c696e74', desc: "Find the hidden 'treasure-x' and give it Sight." }
+        { id: '466c6f7261', desc: "The Ship is stuck on some seaweeds. Clear them (DOM removal)." },
+        { id: '5368726f7564', desc: "The 'honeypot-veil' clouds your vision. Dissolve the element." },
+        { id: '476c696e74', desc: "Find the hidden 'treasure-x' and give it Sight (Opacity curse)." }
     ];
 
     let foundKeyIds = JSON.parse(localStorage.getItem('foundHexIds') || "[]");
@@ -178,19 +172,8 @@
 
         document.getElementById('keys-logged').innerText = foundKeyIds.length ? foundKeyIds.join(", ") : "NONE";
         
-        setupFog();
         setupX();
         startObserver();
-    }
-
-    function setupFog() {
-        const canvas = document.getElementById('fog-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-        ctx.fillStyle = "#0a0a0a";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.globalCompositeOperation = 'destination-out';
     }
 
     function setupX() {
