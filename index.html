@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>The Golden Age: Captain Algos' Cursed Chart</title>
+    <title>Level 1: Captain's Log - Cursed Chart</title>
     <style>
         :root {
             --parchment: #f4e4bc;
@@ -53,9 +53,8 @@
             pointer-events: none;
         }
 
-        /* Puzzle markers with no explicit letter classes */
         #pseudo-trap::after {
-            content: "\0041"; /* Unicode for A, still hidden by opacity */
+            content: "\0041"; 
             position: absolute; top: 20%; left: 20%;
             font-size: 60px; color: var(--blood);
             opacity: 0; 
@@ -131,7 +130,7 @@
             <div id="task-desc" style="margin: 10px 0; min-height: 50px; font-style: italic;">Loading...</div>
             
             <div style="border-top: 1px solid #555; padding-top: 5px;">
-                <b>SALVAGED LOGS:</b> [<span id="keys-logged" style="color: gold;">-</span>]
+                <b>SALVAGED ADDR:</b> [<span id="keys-logged" style="color: gold;">-</span>]
             </div>
 
             <div id="refresh-notice" class="status-msg" style="display:none;">
@@ -144,31 +143,37 @@
     <button class="reset-btn" onclick="localStorage.clear(); location.reload();">RESET CONTEST</button>
 
 <script>
-    // Task list without any direct letter markings
     const allTasks = [
-        { id: 'Wraith', desc: "Find the Ghost in the Captain's Siren Shed." },
-        { id: 'Leviathan', desc: "The Kraken button has surfaced. Catch it to claim the Log!" },
-        { id: 'Flora', desc: "The Ship is stuck on some seaweeds. Clear them." },
-        { id: 'Shroud', desc: "The 'honeypot-veil' clouds your vision. Dissolve it." },
-        { id: 'Glint', desc: "Find the hidden 'treasure-x' and give it Sight." }
+        { id: '577261697468', desc: "Find the Ghost in the Captain's Siren Shed." },
+        { id: '4c657669617468616e', desc: "The Kraken button has surfaced. Catch it to claim the Log!" },
+        { id: '466c6f7261', desc: "The Ship is stuck on some seaweeds. Clear them." },
+        { id: '5368726f7564', desc: "The 'honeypot-veil' clouds your vision. Dissolve it." },
+        { id: '476c696e74', desc: "Find the hidden 'treasure-x' and give it Sight." }
     ];
 
-    let foundKeyIds = JSON.parse(localStorage.getItem('foundKeyIds') || "[]");
+    let foundKeyIds = JSON.parse(localStorage.getItem('foundHexIds') || "[]");
     let activeTask = null;
     let sessionLocked = false;
+
+    function decodeHex(hex) {
+        let str = '';
+        for (let i = 0; i < hex.length; i += 2) {
+            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        }
+        return str;
+    }
 
     function init() {
         const availableTasks = allTasks.filter(t => !foundKeyIds.includes(t.id));
         
         if (availableTasks.length === 0) {
-            // Decrypt the final code only when all logs are present
-            const cipher = "QUxHT1M="; // Base64 for the secret word
-            document.getElementById('task-desc').innerHTML = `<b>ALL CURSES LIFTED!</b><br>FINAL CODE: <span style='color:red'>${atob(cipher)}</span>`;
+            const cipher = "414c474f53"; 
+            document.getElementById('task-desc').innerHTML = `<b>ALL CURSES LIFTED!</b><br>FINAL CODE: <span style='color:red'>${decodeHex(cipher)}</span>`;
         } else {
             activeTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
             document.getElementById('task-desc').innerText = activeTask.desc;
             
-            if (activeTask.id === 'Leviathan') setupKraken();
+            if (activeTask.id === '4c657669617468616e') setupKraken();
         }
 
         document.getElementById('keys-logged').innerText = foundKeyIds.length ? foundKeyIds.join(", ") : "NONE";
@@ -202,7 +207,7 @@
             btn.style.left = Math.random() * 80 + 'vw';
             btn.style.top = Math.random() * 80 + 'vh';
         }, 300);
-        btn.onclick = () => { if(!sessionLocked) completeTask('Leviathan'); };
+        btn.onclick = () => { if(!sessionLocked) completeTask('4c657669617468616e'); };
     }
 
     function startObserver() {
@@ -211,17 +216,17 @@
 
             let solved = false;
             switch(activeTask.id) {
-                case 'Wraith':
+                case '577261697468':
                     const opA = window.getComputedStyle(document.getElementById('pseudo-trap'), '::after').getPropertyValue('opacity');
                     if (parseFloat(opA) >= 1) solved = true;
                     break;
-                case 'Flora':
+                case '466c6f7261':
                     if (!document.getElementById('seaweed-layer')) solved = true;
                     break;
-                case 'Shroud':
+                case '5368726f7564':
                     if (!document.getElementById('honeypot-veil')) solved = true;
                     break;
-                case 'Glint':
+                case '476c696e74':
                     const opS = window.getComputedStyle(document.getElementById('treasure-x')).getPropertyValue('opacity');
                     if (parseFloat(opS) >= 1) solved = true;
                     break;
@@ -233,9 +238,9 @@
     function completeTask(id) {
         sessionLocked = true;
         foundKeyIds.push(id);
-        localStorage.setItem('foundKeyIds', JSON.stringify(foundKeyIds));
+        localStorage.setItem('foundHexIds', JSON.stringify(foundKeyIds));
         document.getElementById('refresh-notice').style.display = 'block';
-        alert(`Log Fragment '${id}' Secured!`);
+        alert(`Memory Address '${id}' Deciphered!`);
     }
 
     window.onload = init;
