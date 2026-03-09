@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Level 1: The Independent Cursed Chart</title>
+    <title>The Golden Age: Captain Algos' Cursed Chart</title>
     <style>
         :root {
             --parchment: #f4e4bc;
@@ -25,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* --- CENTERED HEADING --- */
         .main-title {
             color: var(--parchment);
             text-align: center;
@@ -54,12 +53,12 @@
             pointer-events: none;
         }
 
-        /* --- INDEPENDENT PUZZLE ELEMENTS --- */
+        /* Puzzle markers with no explicit letter classes */
         #pseudo-trap::after {
-            content: "A"; 
+            content: "\0041"; /* Unicode for A, still hidden by opacity */
             position: absolute; top: 20%; left: 20%;
             font-size: 60px; color: var(--blood);
-            opacity: 0; /* PUZZLE A: Opacity -> 1 */
+            opacity: 0; 
         }
 
         #seaweed-layer {
@@ -68,14 +67,12 @@
             background: var(--seaweed);
             z-index: 150;
             border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            /* PUZZLE G: Delete this element */
         }
 
         #honeypot-veil {
             position: absolute; width: 100%; height: 100%;
             z-index: 200;
             background: rgba(139, 0, 0, 0.02); 
-            /* PUZZLE O: Delete this element */
         }
 
         #treasure-x {
@@ -85,7 +82,6 @@
             opacity: 0; 
             z-index: 50;
             transform: translate(-50%, -50%);
-            /* PUZZLE S: Opacity -> 1 */
         }
 
         #submit-btn {
@@ -96,16 +92,15 @@
             border: 2px solid #8b4513;
             z-index: 5000;
             cursor: pointer;
-            display: none; /* Only shown for Task L */
+            display: none; 
         }
 
-        /* --- UI PANELS --- */
         .log-panel {
             position: absolute; bottom: 10px; right: 10px;
             background: rgba(44, 27, 14, 0.95);
             color: #e0c9a6; padding: 15px;
             border: 2px solid #8b4513; font-size: 1rem;
-            width: 300px; z-index: 2000;
+            width: 320px; z-index: 2000;
         }
 
         .status-msg {
@@ -132,15 +127,15 @@
         <div id="treasure-x">X</div>
 
         <div class="log-panel">
-            <b>📜 ASSIGNED TASK:</b>
+            <b>📜 CURRENT ASSIGNMENT:</b>
             <div id="task-desc" style="margin: 10px 0; min-height: 50px; font-style: italic;">Loading...</div>
             
             <div style="border-top: 1px solid #555; padding-top: 5px;">
-                <b>LOGGED KEYS:</b> [<span id="keys-logged" style="color: gold;">-</span>]
+                <b>SALVAGED LOGS:</b> [<span id="keys-logged" style="color: gold;">-</span>]
             </div>
 
             <div id="refresh-notice" class="status-msg" style="display:none;">
-                KEY SECURED! REFRESH TO START NEXT HUNT.
+                LOG SECURED! REFRESH TO SEEK THE NEXT.
             </div>
         </div>
     </div>
@@ -149,33 +144,34 @@
     <button class="reset-btn" onclick="localStorage.clear(); location.reload();">RESET CONTEST</button>
 
 <script>
+    // Task list without any direct letter markings
     const allTasks = [
-        { id: 'A', desc: "Find the Ghost in the Captain's Siren Shed." },
-        { id: 'L', desc: "The Kraken button has surfaced. Catch it to claim the Key!" },
-        { id: 'G', desc: "The 'seaweed-layer' hides the G. Scuttle the element in the DOM." },
-        { id: 'O', desc: "The 'honeypot-veil' clouds your vision. Dissolve it to find O." },
-        { id: 'S', desc: "Find the hidden 'treasure-x' and give it Sight (Opacity to 1)." }
+        { id: 'Wraith', desc: "Find the Ghost in the Captain's Siren Shed." },
+        { id: 'Leviathan', desc: "The Kraken button has surfaced. Catch it to claim the Log!" },
+        { id: 'Flora', desc: "The Ship is stuck on some seaweeds. Clear them." },
+        { id: 'Shroud', desc: "The 'honeypot-veil' clouds your vision. Dissolve it." },
+        { id: 'Glint', desc: "Find the hidden 'treasure-x' and give it Sight." }
     ];
 
-    let foundKeys = JSON.parse(localStorage.getItem('foundKeys') || "[]");
+    let foundKeyIds = JSON.parse(localStorage.getItem('foundKeyIds') || "[]");
     let activeTask = null;
     let sessionLocked = false;
 
     function init() {
-        // Filter out found keys to pick a new independent task
-        const availableTasks = allTasks.filter(t => !foundKeys.includes(t.id));
+        const availableTasks = allTasks.filter(t => !foundKeyIds.includes(t.id));
         
         if (availableTasks.length === 0) {
-            document.getElementById('task-desc').innerHTML = "<b>ALL CURSES LIFTED!</b><br>FINAL CODE: <span style='color:red'>ALGOS</span>";
+            // Decrypt the final code only when all logs are present
+            const cipher = "QUxHT1M="; // Base64 for the secret word
+            document.getElementById('task-desc').innerHTML = `<b>ALL CURSES LIFTED!</b><br>FINAL CODE: <span style='color:red'>${atob(cipher)}</span>`;
         } else {
-            // Pick one random independent task for this session
             activeTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
             document.getElementById('task-desc').innerText = activeTask.desc;
             
-            if (activeTask.id === 'L') setupKraken();
+            if (activeTask.id === 'Leviathan') setupKraken();
         }
 
-        document.getElementById('keys-logged').innerText = foundKeys.length ? foundKeys.join(", ") : "NONE";
+        document.getElementById('keys-logged').innerText = foundKeyIds.length ? foundKeyIds.join(", ") : "NONE";
         
         setupFog();
         setupX();
@@ -205,8 +201,8 @@
             if (sessionLocked) return;
             btn.style.left = Math.random() * 80 + 'vw';
             btn.style.top = Math.random() * 80 + 'vh';
-        }, 250);
-        btn.onclick = () => { if(!sessionLocked) completeTask('L'); };
+        }, 300);
+        btn.onclick = () => { if(!sessionLocked) completeTask('Leviathan'); };
     }
 
     function startObserver() {
@@ -215,17 +211,17 @@
 
             let solved = false;
             switch(activeTask.id) {
-                case 'A':
+                case 'Wraith':
                     const opA = window.getComputedStyle(document.getElementById('pseudo-trap'), '::after').getPropertyValue('opacity');
                     if (parseFloat(opA) >= 1) solved = true;
                     break;
-                case 'G':
+                case 'Flora':
                     if (!document.getElementById('seaweed-layer')) solved = true;
                     break;
-                case 'O':
+                case 'Shroud':
                     if (!document.getElementById('honeypot-veil')) solved = true;
                     break;
-                case 'S':
+                case 'Glint':
                     const opS = window.getComputedStyle(document.getElementById('treasure-x')).getPropertyValue('opacity');
                     if (parseFloat(opS) >= 1) solved = true;
                     break;
@@ -236,10 +232,10 @@
 
     function completeTask(id) {
         sessionLocked = true;
-        foundKeys.push(id);
-        localStorage.setItem('foundKeys', JSON.stringify(foundKeys));
+        foundKeyIds.push(id);
+        localStorage.setItem('foundKeyIds', JSON.stringify(foundKeyIds));
         document.getElementById('refresh-notice').style.display = 'block';
-        alert(`Key ${id} Salvaged!`);
+        alert(`Log Fragment '${id}' Secured!`);
     }
 
     window.onload = init;
